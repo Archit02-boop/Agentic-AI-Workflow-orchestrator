@@ -1,3 +1,4 @@
+import json
 from fastapi import FastAPI, HTTPException
 
 from app.models import WorkflowCreateRequest, WorkflowResponse
@@ -12,8 +13,8 @@ from app.redis_client import push_workflow_event
 
 app = FastAPI(
     title="Agentic AI Workflow Orchestrator",
-    description="A multi-agent workflow orchestration backend using FastAPI, Redis, PostgreSQL, and LangGraph.",
-    version="1.0.0",
+    description="A multi-agent workflow orchestration backend using FastAPI, Redis, PostgreSQL, LangGraph, and Gemini LLM.",
+    version="2.0.0",
 )
 
 
@@ -64,11 +65,21 @@ async def read_workflow(workflow_id: int):
             detail="Workflow not found"
         )
 
+    result = workflow["result"]
+
+    if isinstance(result, str):
+        try:
+            result = json.loads(result)
+        except json.JSONDecodeError:
+            result = {
+                "raw_result": result
+            }
+
     return {
         "workflow_id": workflow["id"],
         "goal": workflow["goal"],
         "status": workflow["status"],
-        "result": workflow["result"],
+        "result": result,
         "error": workflow["error"],
         "created_at": str(workflow["created_at"]),
         "updated_at": str(workflow["updated_at"]),
