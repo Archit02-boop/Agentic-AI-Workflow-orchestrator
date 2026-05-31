@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+asyncpg
+redis
+langgraph
+python-dotenv
+pytest
+pytest-asyncio
+httpx
